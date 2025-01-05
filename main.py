@@ -88,7 +88,13 @@ class Node:
     end: np.ndarray
 
     def cost(self, other):
-        return np.linalg.norm(np.subtract(self.end, other.start))
+        # Approxmiate curve
+        dists = [100, 200, 300]
+        dists = [dist +20*np.pi for dist in [100, 200, 300]]
+        times = [2192, 3180, 4188]
+        
+        dist = np.linalg.norm(np.subtract(self.end, other.start))
+        return dist#np.interp(dist, dists, times)
     
     
 # Cost of edge is calculated as distance between first line's end point and second line's start point.
@@ -189,18 +195,18 @@ def plot(grid_size, work_map, graph, path):
     plt.show()
 
 def main():
-    np.random.seed(70)
+    np.random.seed(690)
     params = {
-        'map_size': [4, 2],
+        'map_size': [400, 280],
         'num_lines': 6,
         'num_connected': 1,
-        'line_length': [0.2, 0.5],
-        'precision': 0.1,
+        'line_length': [40, 120],
+        'precision': 5,
     }
 
     # Generate map
     work_map = Map(**params)
-    work_map.set_walls([[(0., 1.2), (1.0, 1.2)]])
+    work_map.set_walls([[(0., 50), (70, 50)]])
     graph = Graph()
 
     # Start and end is at (0, 0)
@@ -235,8 +241,12 @@ def main():
     best_path, min_cost = graph.tsp_brute_force('start', 'end', pairs)
 
     print(best_path, min_cost)
-    plot(work_map.size, work_map, graph, best_path)
+    for node_id in best_path:
+        node = graph.nodes[node_id]
+        print(node_id, node.start, node.end)
 
+    plot(work_map.size, work_map, graph, best_path)
+    
 
 if __name__ == "__main__":
     main()
